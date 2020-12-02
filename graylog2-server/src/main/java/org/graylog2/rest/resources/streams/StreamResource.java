@@ -163,7 +163,9 @@ public class StreamResource extends RestResource {
     public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr,
                            @Context UserContext userContext) throws ValidationException {
         // Create stream.
+    	LOG.info("Creating stream #####################");
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
+        LOG.info("Getting stream ****** ");
         stream.setDisabled(true);
 
         if (!stream.getIndexSet().getConfig().isWritable()) {
@@ -173,8 +175,9 @@ public class StreamResource extends RestResource {
         final Set<StreamRule> streamRules = cr.rules().stream()
                 .map(streamRule -> streamRuleService.create(null, streamRule))
                 .collect(Collectors.toSet());
+        LOG.info("Getting stream rules ****** ");
         final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
-
+        LOG.info("Stream created #####################");
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
             .path("{streamId}")
